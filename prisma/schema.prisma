@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int      @id @default(autoincrement())
+  username           String   @unique
+  password           String
+  role               String
+  mustChangePassword Boolean  @default(false)
+  studentId          Int?     @unique
+  student            Student? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Student {
+  id              Int      @id @default(autoincrement())
+  admissionNumber String   @unique
+  firstName       String
+  middleName      String?
+  lastName        String
+  gender          String
+  dateOfBirth     DateTime?
+  phone           String?
+  email           String?
+  address         String?
+  classId         Int
+  klass           Class    @relation(fields: [classId], references: [id])
+  graduationYear  Int?
+  passportPhoto   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User?
+  results         Result[]
+}
+
+model Class {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  students  Student[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isCurrent Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  terms     Term[]
+  results   Result[]
+}
+
+model Term {
+  id        Int      @id @default(autoincrement())
+  name      String
+  sessionId Int
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  results   Result[]
+
+  @@unique([sessionId, name])
+}
+
+model Subject {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  results   Result[]
+}
+
+model Result {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId Int
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  sessionId Int
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  termId    Int
+  term      Term     @relation(fields: [termId], references: [id], onDelete: Cascade)
+  ca        Int
+  exam      Int
+  total     Int
+  grade     String
+  remark    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, sessionId, termId, subjectId])
+  @@index([sessionId])
+  @@index([termId])
+}
