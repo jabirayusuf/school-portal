@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const result_controller_1 = require("../controllers/result.controller");
+const auth_1 = require("../middlewares/auth");
+const upload_1 = require("../middlewares/upload");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate);
+router.get('/', result_controller_1.handleListResults);
+router.get('/template', auth_1.requireAdmin, result_controller_1.handleDownloadTemplate);
+router.post('/', auth_1.requireAdmin, result_controller_1.handleCreateResult);
+router.put('/:id', auth_1.requireAdmin, result_controller_1.handleUpdateResult);
+router.delete('/:id', auth_1.requireAdmin, result_controller_1.handleDeleteResult);
+router.post('/upload', auth_1.requireAdmin, upload_1.uploadExcel.single('file'), result_controller_1.handleUploadResults);
+exports.default = router;

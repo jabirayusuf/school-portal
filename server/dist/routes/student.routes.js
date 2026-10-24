@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const student_controller_1 = require("../controllers/student.controller");
+const auth_1 = require("../middlewares/auth");
+const upload_1 = require("../middlewares/upload");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate, auth_1.requireAdmin);
+router.get('/', student_controller_1.handleListStudents);
+router.post('/', student_controller_1.handleCreateStudent);
+router.get('/:id', student_controller_1.handleGetStudent);
+router.put('/:id', student_controller_1.handleUpdateStudent);
+router.delete('/:id', student_controller_1.handleDeleteStudent);
+router.post('/:id/photo', upload_1.uploadPhoto.single('photo'), student_controller_1.handleUploadPhoto);
+exports.default = router;

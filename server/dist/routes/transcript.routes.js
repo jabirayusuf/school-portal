@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const transcript_controller_1 = require("../controllers/transcript.controller");
+const auth_1 = require("../middlewares/auth");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate);
+router.get('/class/:classId', auth_1.requireAdmin, transcript_controller_1.handleGetClassReport);
+router.get('/class/:classId/pdf', auth_1.requireAdmin, transcript_controller_1.handleGetClassReportPdf);
+router.get('/:studentId', transcript_controller_1.handleGetTranscript);
+router.get('/:studentId/pdf', transcript_controller_1.handleGetTranscriptPdf);
+exports.default = router;
